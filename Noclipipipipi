@@ -1,0 +1,100 @@
+-- Création du GUI
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TrafficToggleGui"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 120, 0, 40)
+button.Position = UDim2.new(1, -130, 0, 10)
+button.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+button.TextColor3 = Color3.new(1,1,1)
+button.Text = "OFF"
+button.Parent = screenGui
+
+-- Etat
+local enabled = false
+
+-- Liste des wheels à supprimer
+local wheelsToDelete = {
+    ["$wheel0"] = true,
+    ["$wheel1"] = true,
+    ["$wheel2"] = true,
+    ["$wheel3"] = true
+}
+
+-- Fonction principale
+local function processTraffic()
+    local trafficFolder = workspace:FindFirstChild("Traffic")
+    if not trafficFolder then return end
+
+    for _, model in ipairs(trafficFolder:GetChildren()) do
+        if model:IsA("Model") then
+            
+            local part = model:FindFirstChild("Part")
+            if part then
+                
+                -- 🔍 AI_CarBody
+                local aiBody = part:FindFirstChild("AI_CarBody")
+                if aiBody then
+                    
+                    -- 🔥 Supprimer HITBOX dans AI_CarBody
+                    local hitbox = aiBody:FindFirstChild("HITBOX")
+                    if hitbox and hitbox:IsA("BasePart") then
+                        hitbox:Destroy()
+                    end
+
+                    -- 🛞 Supprimer les wheels
+                    for _, child in ipairs(aiBody:GetChildren()) do
+                        if wheelsToDelete[child.Name] then
+                            child:Destroy()
+                        end
+                    end
+
+                    -- 🚗 Supprimer Vehicle_Lights (CORRIGÉ ICI)
+                    local vehicleLights = aiBody:FindFirstChild("Vehicle_Lights")
+                    if vehicleLights then
+                        vehicleLights:Destroy()
+                    end
+                end
+
+                -- 🔥 HITBOX direct dans Part
+                local directHitbox = part:FindFirstChild("HITBOX")
+                if directHitbox and directHitbox:IsA("BasePart") then
+                    directHitbox:Destroy()
+                end
+
+                -- 💡 Supprimer Lights dans Part
+                local lights = part:FindFirstChild("Lights")
+                if lights then
+                    lights:Destroy()
+                end
+
+            end
+
+        end
+    end
+end
+
+-- Loop
+task.spawn(function()
+    while true do
+        if enabled then
+            processTraffic()
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- Toggle bouton
+button.MouseButton1Click:Connect(function()
+    enabled = not enabled
+    
+    if enabled then
+        button.Text = "ON"
+        button.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+    else
+        button.Text = "OFF"
+        button.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    end
+end)
