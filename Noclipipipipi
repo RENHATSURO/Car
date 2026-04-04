@@ -1,21 +1,58 @@
--- Création du GUI
 local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- ================= GUI =================
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "TrafficToggleGui"
-screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.Name = "CombinedGui"
+screenGui.Parent = playerGui
 
-local button = Instance.new("TextButton")
-button.Size = UDim2.new(0, 120, 0, 40)
-button.Position = UDim2.new(1, -130, 0, 10)
-button.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-button.TextColor3 = Color3.new(1,1,1)
-button.Text = "OFF"
-button.Parent = screenGui
+-- 🔴 BOUTON MONEY (haut gauche)
+local moneyButton = Instance.new("TextButton")
+moneyButton.Size = UDim2.new(0, 100, 0, 40)
+moneyButton.Position = UDim2.new(0, 10, 0, 10)
+moneyButton.Text = "Money OFF"
+moneyButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+moneyButton.TextColor3 = Color3.new(1,1,1)
+moneyButton.Parent = screenGui
 
--- Etat
-local enabled = false
+-- 🟢 BOUTON TRAFFIC (haut droite)
+local trafficButton = Instance.new("TextButton")
+trafficButton.Size = UDim2.new(0, 120, 0, 40)
+trafficButton.Position = UDim2.new(1, -130, 0, 10)
+trafficButton.Text = "Traffic OFF"
+trafficButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+trafficButton.TextColor3 = Color3.new(1,1,1)
+trafficButton.Parent = screenGui
 
--- Liste des wheels à supprimer
+-- ================= STATES =================
+local moneyEnabled = false
+local trafficEnabled = false
+
+-- ================= MONEY SYSTEM =================
+local function giveMoney()
+    local remote = game:GetService("ReplicatedStorage"):WaitForChild("GiveMoneyEvent")
+
+    while moneyEnabled do
+        remote:FireServer(2500, "Driving income")
+        remote:FireServer(2500, "Near miss!")
+        task.wait(0.1)
+    end
+end
+
+moneyButton.MouseButton1Click:Connect(function()
+    moneyEnabled = not moneyEnabled
+
+    if moneyEnabled then
+        moneyButton.Text = "Money ON"
+        moneyButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+        task.spawn(giveMoney)
+    else
+        moneyButton.Text = "Money OFF"
+        moneyButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    end
+end)
+
+-- ================= TRAFFIC CLEANER =================
 local wheelsToDelete = {
     ["$wheel0"] = true,
     ["$wheel1"] = true,
@@ -23,7 +60,6 @@ local wheelsToDelete = {
     ["$wheel3"] = true
 }
 
--- Fonction principale
 local function processTraffic()
     local trafficFolder = workspace:FindFirstChild("Traffic")
     if not trafficFolder then return end
@@ -34,67 +70,63 @@ local function processTraffic()
             local part = model:FindFirstChild("Part")
             if part then
                 
-                -- 🔍 AI_CarBody
                 local aiBody = part:FindFirstChild("AI_CarBody")
                 if aiBody then
                     
-                    -- 🔥 Supprimer HITBOX dans AI_CarBody
+                    -- HITBOX AI_CarBody
                     local hitbox = aiBody:FindFirstChild("HITBOX")
                     if hitbox and hitbox:IsA("BasePart") then
                         hitbox:Destroy()
                     end
 
-                    -- 🛞 Supprimer les wheels
+                    -- Wheels
                     for _, child in ipairs(aiBody:GetChildren()) do
                         if wheelsToDelete[child.Name] then
                             child:Destroy()
                         end
                     end
 
-                    -- 🚗 Supprimer Vehicle_Lights (CORRIGÉ ICI)
+                    -- Vehicle Lights
                     local vehicleLights = aiBody:FindFirstChild("Vehicle_Lights")
                     if vehicleLights then
                         vehicleLights:Destroy()
                     end
                 end
 
-                -- 🔥 HITBOX direct dans Part
+                -- HITBOX direct
                 local directHitbox = part:FindFirstChild("HITBOX")
                 if directHitbox and directHitbox:IsA("BasePart") then
                     directHitbox:Destroy()
                 end
 
-                -- 💡 Supprimer Lights dans Part
+                -- Lights
                 local lights = part:FindFirstChild("Lights")
                 if lights then
                     lights:Destroy()
                 end
-
             end
-
         end
     end
 end
 
--- Loop
+-- Loop traffic
 task.spawn(function()
     while true do
-        if enabled then
+        if trafficEnabled then
             processTraffic()
         end
         task.wait(0.5)
     end
 end)
 
--- Toggle bouton
-button.MouseButton1Click:Connect(function()
-    enabled = not enabled
-    
-    if enabled then
-        button.Text = "ON"
-        button.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+trafficButton.MouseButton1Click:Connect(function()
+    trafficEnabled = not trafficEnabled
+
+    if trafficEnabled then
+        trafficButton.Text = "Traffic ON"
+        trafficButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
     else
-        button.Text = "OFF"
-        button.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        trafficButton.Text = "Traffic OFF"
+        trafficButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     end
 end)
