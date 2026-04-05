@@ -33,8 +33,8 @@ local function giveMoney()
     local remote = game:GetService("ReplicatedStorage"):WaitForChild("GiveMoneyEvent")
 
     while moneyEnabled do
-        remote:FireServer(2500, "Driving income")
-        remote:FireServer(2500, "Near miss!")
+        remote:FireServer(2500, "S€X with diddy")
+        remote:FireServer(2500, "goon with sigeon pex")
         task.wait(0.1)
     end
 end
