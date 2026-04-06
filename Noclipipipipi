@@ -34,7 +34,7 @@ local function giveMoney()
 
     while moneyEnabled do
         remote:FireServer(2500, "Driving income")
-        remote:FireServer(2500, "Driving income")
+        remote:FireServer(2500, "Near miss!")
         task.wait(0.1)
     end
 end
