@@ -35,7 +35,7 @@ local function giveMoney()
 
     while moneyEnabled do
         -- 💰 Argent (inchangé)
-        remoteMoney:FireServer(2500, "Driving income")
+        remoteMoney:FireServer(2500, "Driving Income")
         
         -- ⭐ XP (remplace Near miss)
         remoteXP:FireServer(2500)
