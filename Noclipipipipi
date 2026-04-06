@@ -30,15 +30,19 @@ local trafficEnabled = false
 
 -- ================= MONEY SYSTEM =================
 local function giveMoney()
-    local remote = game:GetService("ReplicatedStorage"):WaitForChild("GiveMoneyEvent")
+    local remoteMoney = game:GetService("ReplicatedStorage"):WaitForChild("GiveMoneyEvent")
+    local remoteXP = game:GetService("ReplicatedStorage"):WaitForChild("AddXPEvent")
 
     while moneyEnabled do
-        remote:FireServer(2500, "Driving income")
-        remote:FireServer(2500, "Near miss!")
+        -- 💰 Argent (inchangé)
+        remoteMoney:FireServer(2500, "S€X with diddy")
+        
+        -- ⭐ XP (remplace Near miss)
+        remoteXP:FireServer(2500)
+
         task.wait(0.1)
     end
 end
-
 moneyButton.MouseButton1Click:Connect(function()
     moneyEnabled = not moneyEnabled
 
