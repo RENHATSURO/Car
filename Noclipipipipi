@@ -99,7 +99,7 @@ task.spawn(function()
         if trafficEnabled then
             processTraffic()
         end
-        task.wait(0.5)
+        task.wait(0.1)
     end
 end)
 
