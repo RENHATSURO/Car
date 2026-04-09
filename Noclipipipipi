@@ -6,7 +6,7 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CombinedGui"
 screenGui.Parent = playerGui
 
--- MONEY BUTTON
+-- 💰 BOUTON MONEY
 local moneyButton = Instance.new("TextButton")
 moneyButton.Size = UDim2.new(0, 100, 0, 40)
 moneyButton.Position = UDim2.new(0, 10, 0, 10)
@@ -15,7 +15,16 @@ moneyButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 moneyButton.TextColor3 = Color3.new(1,1,1)
 moneyButton.Parent = screenGui
 
--- TRAFFIC BUTTON
+-- ⭐ BOUTON XP (en dessous)
+local xpButton = Instance.new("TextButton")
+xpButton.Size = UDim2.new(0, 100, 0, 40)
+xpButton.Position = UDim2.new(0, 10, 0, 60) -- juste en dessous
+xpButton.Text = "XP OFF"
+xpButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+xpButton.TextColor3 = Color3.new(1,1,1)
+xpButton.Parent = screenGui
+
+-- 🚗 BOUTON TRAFFIC
 local trafficButton = Instance.new("TextButton")
 trafficButton.Size = UDim2.new(0, 120, 0, 40)
 trafficButton.Position = UDim2.new(1, -130, 0, 10)
@@ -26,23 +35,20 @@ trafficButton.Parent = screenGui
 
 -- ================= STATES =================
 local moneyEnabled = false
+local xpEnabled = false
 local trafficEnabled = false
 
--- ================= MONEY SYSTEM =================
+-- ================= MONEY =================
 local function giveMoney()
     local remoteMoney = game:GetService("ReplicatedStorage"):FindFirstChild("GiveMoneyEvent")
-    local remoteXP = game:GetService("ReplicatedStorage"):FindFirstChild("AddXPEvent")
-
-    if not remoteMoney or not remoteXP then
-        warn("RemoteEvents introuvables")
+    if not remoteMoney then
+        warn("GiveMoneyEvent introuvable")
         return
     end
 
     while moneyEnabled do
         remoteMoney:FireServer(2500, "Driving income")
-        remoteXP:FireServer(2500)
-
-        task.wait(0.2) -- plus safe
+        task.wait(0.2)
     end
 end
 
@@ -59,7 +65,34 @@ moneyButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- ================= TRAFFIC CLEANER =================
+-- ================= XP =================
+local function giveXP()
+    local remoteXP = game:GetService("ReplicatedStorage"):FindFirstChild("AddXPEvent")
+    if not remoteXP then
+        warn("AddXPEvent introuvable")
+        return
+    end
+
+    while xpEnabled do
+        remoteXP:FireServer(2500)
+        task.wait(0.01)
+    end
+end
+
+xpButton.MouseButton1Click:Connect(function()
+    xpEnabled = not xpEnabled
+
+    if xpEnabled then
+        xpButton.Text = "XP ON"
+        xpButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+        task.spawn(giveXP)
+    else
+        xpButton.Text = "XP OFF"
+        xpButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    end
+end)
+
+-- ================= TRAFFIC =================
 local function processTraffic()
     local trafficFolder = workspace:FindFirstChild("Traffic")
     if not trafficFolder then return end
