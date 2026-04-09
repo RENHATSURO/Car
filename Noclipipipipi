@@ -6,7 +6,7 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CombinedGui"
 screenGui.Parent = playerGui
 
--- 🔴 BOUTON MONEY (haut gauche)
+-- MONEY BUTTON
 local moneyButton = Instance.new("TextButton")
 moneyButton.Size = UDim2.new(0, 100, 0, 40)
 moneyButton.Position = UDim2.new(0, 10, 0, 10)
@@ -15,7 +15,7 @@ moneyButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 moneyButton.TextColor3 = Color3.new(1,1,1)
 moneyButton.Parent = screenGui
 
--- 🟢 BOUTON TRAFFIC (haut droite)
+-- TRAFFIC BUTTON
 local trafficButton = Instance.new("TextButton")
 trafficButton.Size = UDim2.new(0, 120, 0, 40)
 trafficButton.Position = UDim2.new(1, -130, 0, 10)
@@ -30,14 +30,19 @@ local trafficEnabled = false
 
 -- ================= MONEY SYSTEM =================
 local function giveMoney()
-    local remoteMoney = game:GetService("ReplicatedStorage"):WaitForChild("GiveMoneyEvent")
-    local remoteXP = game:GetService("ReplicatedStorage"):WaitForChild("AddXPEvent")
+    local remoteMoney = game:GetService("ReplicatedStorage"):FindFirstChild("GiveMoneyEvent")
+    local remoteXP = game:GetService("ReplicatedStorage"):FindFirstChild("AddXPEvent")
+
+    if not remoteMoney or not remoteXP then
+        warn("RemoteEvents introuvables")
+        return
+    end
 
     while moneyEnabled do
         remoteMoney:FireServer(2500, "Driving income")
         remoteXP:FireServer(2500)
 
-        task.wait(0.03)
+        task.wait(0.2) -- plus safe
     end
 end
 
@@ -55,63 +60,40 @@ moneyButton.MouseButton1Click:Connect(function()
 end)
 
 -- ================= TRAFFIC CLEANER =================
-local wheelsToDelete = {
-    ["$wheel0"] = true,
-    ["$wheel1"] = true,
-    ["$wheel2"] = true,
-    ["$wheel3"] = true
-}
-
 local function processTraffic()
     local trafficFolder = workspace:FindFirstChild("Traffic")
     if not trafficFolder then return end
 
     for _, model in ipairs(trafficFolder:GetChildren()) do
         if model:IsA("Model") then
-            
             local part = model:FindFirstChild("Part")
             if part then
-                
                 local aiBody = part:FindFirstChild("AI_CarBody")
-                if aiBody then
-                    
-                    -- HITBOX AI_CarBody
-                    local hitbox = aiBody:FindFirstChild("HITBOX")
-                    if hitbox and hitbox:IsA("BasePart") then
-                        hitbox:Destroy()
-                    end
 
-                    -- Wheels
+                if aiBody then
+                    local hitbox = aiBody:FindFirstChild("HITBOX")
+                    if hitbox then hitbox:Destroy() end
+
                     for _, child in ipairs(aiBody:GetChildren()) do
-                        if wheelsToDelete[child.Name] then
+                        if child.Name:match("%$wheel") then
                             child:Destroy()
                         end
                     end
 
-                    -- Vehicle Lights
                     local vehicleLights = aiBody:FindFirstChild("Vehicle_Lights")
-                    if vehicleLights then
-                        vehicleLights:Destroy()
-                    end
+                    if vehicleLights then vehicleLights:Destroy() end
                 end
 
-                -- HITBOX direct
                 local directHitbox = part:FindFirstChild("HITBOX")
-                if directHitbox and directHitbox:IsA("BasePart") then
-                    directHitbox:Destroy()
-                end
+                if directHitbox then directHitbox:Destroy() end
 
-                -- Lights
                 local lights = part:FindFirstChild("Lights")
-                if lights then
-                    lights:Destroy()
-                end
+                if lights then lights:Destroy() end
             end
         end
     end
 end
 
--- Loop traffic
 task.spawn(function()
     while true do
         if trafficEnabled then
