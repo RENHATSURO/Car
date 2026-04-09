@@ -30,7 +30,7 @@ local trafficEnabled = false
 
 -- ================= MONEY SYSTEM =================
 local function giveMoney()
-    local remoteMoney = game:GetService("Replicatedstorage"):WaitForChild("GiveMoneyEvent")
+    local remoteMoney = game:GetService("ReplicatedStorage"):WaitForChild("GiveMoneyEvent")
     local remoteXP = game:GetService("ReplicatedStorage"):WaitForChild("AddXPEvent")
 
     while moneyEnabled do
