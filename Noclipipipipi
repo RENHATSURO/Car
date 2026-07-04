@@ -6,7 +6,7 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CombinedGui"
 screenGui.Parent = playerGui
 
--- 💰 BOUTON MONEY
+
 local moneyButton = Instance.new("TextButton")
 moneyButton.Size = UDim2.new(0, 100, 0, 40)
 moneyButton.Position = UDim2.new(0, 10, 0, 10)
@@ -15,7 +15,7 @@ moneyButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 moneyButton.TextColor3 = Color3.new(1,1,1)
 moneyButton.Parent = screenGui
 
--- ⭐ BOUTON XP (en dessous)
+
 local xpButton = Instance.new("TextButton")
 xpButton.Size = UDim2.new(0, 100, 0, 40)
 xpButton.Position = UDim2.new(0, 10, 0, 60) -- juste en dessous
@@ -24,7 +24,7 @@ xpButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 xpButton.TextColor3 = Color3.new(1,1,1)
 xpButton.Parent = screenGui
 
--- 🚗 BOUTON TRAFFIC
+
 local trafficButton = Instance.new("TextButton")
 trafficButton.Size = UDim2.new(0, 120, 0, 40)
 trafficButton.Position = UDim2.new(1, -130, 0, 10)
